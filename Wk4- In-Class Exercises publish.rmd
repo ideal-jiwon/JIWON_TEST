@@ -1,0 +1,104 @@
+---
+title: "WK4 - In-Class Exercises"
+author: "jiwon mok - George Mason University, School of Business"
+output:
+  pdf_document: 
+    latex_engine: xelatex
+---
+
+q 1 - Use the daily show data which is also available in the package fivethirtyeight. But for now, use the data available in the link. Convert the existing variable to date variable. 
+Also find the number of shows that were done on Tuesday and Friday
+
+
+```{r}
+library(readr)
+library(dplyr)
+library(stringr)
+
+daily_show <- read_csv('https://raw.githubusercontent.com/fivethirtyeight/data/master/daily-show-guests/daily_show_guests.csv',col_names = TRUE,show_col_types = FALSE )
+show(daily_show)
+```
+
+```{r}
+library(lubridate)
+#New Variable with the day of the week
+daily_show %>%
+  mutate(Show = mdy(Show)) %>%
+  mutate(Show_day = wday(Show, label=TRUE))%>%
+  group_by(Show_day) %>% 
+          summarise(count_wkday = n())
+```
+
+q2 Use the world cup data available in library(faraway) and use the data(worldcup)
+How many players have the name with characters “ab” together
+Find all players whose name begins with “S”.
+
+```{r}
+# Load the dataset
+library(faraway)
+data(worldcup)
+#The dataset does not load the name, so create a new variable with player name
+worldcup <- worldcup %>%
+  mutate(player_name = rownames(worldcup))
+
+```
+
+```{r}
+# Find all the players whose name has the character ab. 
+# Hint - In this case, the characters could be at the beginning, between or end. This will also determine if you need to use lower case of upper case characters
+worldcup %>%
+  select(player_name) %>%
+  filter(c(player_name, regex("ab", ignore_case = TRUE)))
+
+```
+
+```{r}
+#Find all the players whose name starts with S
+worldcup %>%
+  select(player_name) %>%
+  filter(??(player_name, "??"))
+```
+
+
+
+# Data Decisions
+
+q3 Use the following vector
+numeric_data <- c(7, 8, 9.5, 5.6, 11,1,-1,-22)
+Use the ifelse() function to check if value is greater than or equal to 3 or less than 3
+Also implement the if else logic to replace the 3rd element in the vector by 5, if the mean value is greater than 2, else replace the 4th vector by 3. 
+
+
+- Load the required libraries
+```{r}
+# Part A
+# Install and then load the Tidyverse
+library(tidyverse)
+# Load the content from the excel file into the data frame
+numeric_data <- c(7, 8, 9.5, 5.6, 11,1,-1,-22)
+
+# Check if value is greater than or equal to 3 or less than 3
+less_3_check <- ifelse(??, "Less than 3", "3 or greater")
+
+```
+
+```{r}
+# Part B
+# Implement logic
+
+# Assign the mean
+numeric_data_mean <- numeric_data %>% ??
+# Implement ifelse logic by using subsetting. 
+ifelse(??, ??, ??)
+numeric_data
+```
+q4 Use the map_dbl() (dbl is numeric) function to create a numeric vector that contains the column averages of all the variables in the built-in data frame, mtcars.
+```{r}
+# Use the library purrr
+library(purrr)
+# map_dbl with mean
+mean_mtcars <- mtcars %>% ???
+mean_mtcars
+```
+
+

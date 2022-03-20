@@ -1,0 +1,58 @@
+---
+title: "WK3 - In-Class Exercises"
+author: "Jingyuan Yang - George Mason University, School of Business"
+output:
+  pdf_document: 
+    latex_engine: xelatex
+---
+
+1 - Use the heart dataset and answer the following questions
+Create a new dataset called heart_gender and use the split-apply-combine principle to group by gender, and ThalliumStresstest, and provide their count, avg age,  min restbp, max restbp, and avg maxhr
+
+- Load the required libraries
+```{r}
+# Install and then load the library readxl and Tidyverse
+library(????)
+library(??)
+# Load the content from the excel file into the data frame
+heart <-  ??("???")
+
+```
+
+```{r}
+heart_gender <- ?? %>%
+  ??(Gender, ThalliumStressTest) %>%
+  ??(gender_count = ??,
+            avg_age = ??(Age),
+            min_restbp =??(RestBP),
+            max_restbp = ??(RestBP),
+            avg_maxhr = ??(MaxHR))
+heart_gender
+```
+
+2 - Create a new dataset - heart_age using the heart dataset. heart_age should have a new variable (AgeCategory), which combines the age and gender to provide the following categories (Use case_when)
+Men30+,Women30+,MenUnder30, and WomenUnder30
+
+```{r}
+heart_age <- ?? %>%
+  ??(AgeCategory = 
+                  ??(
+                       Age >= 30 ?? Gender =="??" ?? 'Men30+',
+                       Age ?? 30 & Gender =="??" ~ 'Women30+',
+                       Age ?? 30 & Gender =="male" ~ '??',
+                       Age ?? 30 & Gender =="??" ~ 'WomenUnder30')
+                  )
+heart_age
+```
+
+3 - Use the heart_age dataset created above.
+Create a RestBP_category variable that bins values in 10 increments
+Form groups by AgeCategory and RestBP_category
+Count the number of patients that fall into each combination
+
+```{r}
+?? %>% 
+  ??(RestBP_category = ??(RestBP, ?? = 10, ?? = 0)) %>% 
+  group_by(??,AgeCategory) %>% 
+  summarize(Patients = ??)
+```

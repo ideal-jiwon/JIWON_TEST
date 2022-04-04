@@ -1,0 +1,145 @@
+---
+title: "Mid-Term Data Analysis Project"
+author: "Jiwon Mok"
+date: "04/03/2022"
+output:
+  word_document: default
+  pdf_document: default
+---
+
+## 1. Introduction. 
+
+  The project aims to perform the initial data analysis for a U.S-based company to find the fundamental problem that employees are leaving the company and to come up with solutions to prevent people from leaving the company and further reduce the turnover rate in the end. 
+  In the recent past, during and after the pandemic, a lot of companies had their employees work remotely, and some expanded their business to hire more employees by increasing 1.5% or above salaries from their previous workplaces. In that regard, people come to think of the time they used to consume for commuting and start looking for companies where they can work remotely or located near their homes. Being a U.S-based company and a tech company, employee retention is challenging since there has been a flooding demand for tech positions in the job markets. Therefore, this report will analyze if there is any relationship between turnover rate and distance from the workplace to employees' homes.
+
+Appendix_1
+```{r}
+library(dplyr)
+library(scales)
+library(tidyverse)
+employee_data <- read_csv("~/Desktop/EmployeeData.csv")
+```
+
+## 2. Data and Model
+
+1. Is the distance from workplace to home the significant factor contributing to the increasing turnover rate to employees?
+(Divide the section into the following categories.)
+
+No, proximity is not a significant factor contributing to the turnover rate of employees. 
+Based on the numbers in the table, the average miles of employees who left the company are 10.6 while people who have not left live 8.9 on average from the workplace. Even though people who left the company lived 1.1 miles further away from the company, it is not a significant difference. However, it was true that there was more number of current employees proportioned to the points that they lived within 10 miles from the workplace at 71% while people who quit the job make up for 60%.
+
+Appendix_2(A) employee data
+```{r}
+employee_data %>% group_by(left_company) %>%
+                  summarise(n_employees = n(),
+                            min_miles = min(miles_from_home),
+                            avg_miles = mean(miles_from_home),
+                            max_miles = max(miles_from_home),
+                            sd_miles = sd(miles_from_home),
+                            miles_less_10 = mean(miles_from_home <=10),
+                            miles_less_20 = mean(miles_from_home <=20 & miles_from_home >10),
+                            miles_less_30 = mean(miles_from_home <=30 & miles_from_home >20),
+                            miles_above_30 = mean(miles_from_home >30))
+```
+
+Appendix_2(B) visualization_employee_data
+```{r}
+
+ggplot(data = employee_data, aes(x = miles_from_home, fill = left_company)) +
+  geom_histogram(aes(y= ..density..), color = "white", bins = 20) +
+  facet_wrap( ~ left_company, nrow = 2) +
+  labs(title = "Employee turnover rate by distance from their home (Left the Company-Yes/No)",
+       x = "Distance(miles)", y= "Proportion of Employees")
+
+```
+
+Such a trend is also apparent even in the histogram graph above. If the distance is the most contributing factor, the numbers of longer miles should be proportioned more than the ones with shorter miles. However, the majority of employees living less than 10miles are ranged from 60 to 70 for both who have not left and left the company. Therefore, distance cannot be considered as the factor that people left the company. 
+
+2. If the distance is not a significant factor, how do employees in general value how far it is from home to company? 
+   Can you answer it without running any predictive models?
+   
+Employees in general live close to the company. The number of employees who have not left the company is 1233. The average number of miles from home to the company is 8.9, which is within 10miles. Moreover, the majority of them (70%) live less than 10 miles, and none of them live 30 miles further away from the workplace. It was clear to see in the table without running any predictive models. However, it is more obvious to see in the plot. 
+
+
+3. If distance is not a significant factor, can job-satisfaction be another contributing factor? 
+
+Appendix_3(A) table_relationship between job_Satisfaction and left_company
+```{r}
+job_satisfaction2 <- employee_data %>% group_by(left_company) %>%
+  count(job_satisfaction)
+job_satisfaction2
+```
+Appendix_3(B) visualization ggplot_job satisfaction
+```{r}
+#Data Visualization 
+ggplot(job_satisfaction2, aes(job_satisfaction, n, fill = left_company)) +
+  geom_bar(position =  "fill", stat="identity") +
+  scale_y_continuous(labels=percent) +
+  labs( y="proportion", 
+       title ="The Job satisfaction by Status")
+```
+Yes. Job satisfaction can be a significant factor contributing to the turnover rate based on the numbers on the graph. Unlike the distance between home and workplace, job_satisfaction shows the significant difference that people who left the company make up for more than 70% in high and very high parts. Even though there are about 75% of current employees who have not left the company have low job satisfaction while who left account for one-third of them. 
+
+
+4. If job satisfaction is one of the contributing factors, can you answer it without running any predictive models?
+
+It is possible to answer that employees with a high satisfaction rate are more likely to stay at the company. However, it needs additional calculations for in-depth analysis. Since more employees left the company, their numbers are bigger. 407 employees answered "very high" in job satisfaction, and 369 said high. Considering the overall number of employees is 1470, they account for half, and job satisfaction is a huge contributing factor. However, it is more clear to see the proportion in the plot since no additional calculation is needed and different colors easily distinguish them. 
+
+
+5. If there a relationship between employees leaving the company and their current salary? (Scatter plot)
+
+Appendix_4(A)employee's salary data
+```{r}
+employee_data %>% group_by(left_company) %>%
+                  summarise(n_employees = n(),
+                            min_salary = min(salary),
+                            avg_salary = mean(salary),
+                            max_salary = max(salary),
+                            sd_salary = sd(salary),
+                            pct_less_60k = mean(salary <= 60000))
+```
+Appendix_4(B) ggplot_ employee's salary data
+```{r}
+ggplot(data = employee_data, aes(x = salary, y= left_company)) +
+    geom_point(color = "red", size = 1)+
+    labs(title  = "Employee Salary Distribution by Status", x = "Salary", y="Employees")
+```
+Yes. It is quite clear to see in the plot that salary is the contributing factor leading to the high turnover rate of the company. In the scatter plot, in the salary range from 15k to 20k, employees who have not left the company are densely populated while only a few people who left are in the range. Moreover, there is a tendency that a lot of them who quit are mostly populated in the salary range from around 50k to 100k accounting for 34%. On the other hand, employees' salary range seems to be constant from 50k to 130k making up for less than 10%(9.7%). 
+
+6. If the salary is one of the contributing factors, which range of salary is considered as low which likely leads to high turnover rate?
+
+Appendix_5 employee's salary range 
+```{r}
+employee_data %>% group_by(left_company) %>%
+                  summarise(n_employees = n(),
+                            min_salary = min(salary),
+                            avg_salary = mean(salary),
+                            max_salary = max(salary),
+                            sd_salary = sd(salary),
+                            pct_less_60k = mean(salary <= 60000),
+                            pct_less_80k = mean(salary > 60000 & salary <= 80000),
+                            pct_less_100k = mean(salary > 80000 & salary <= 100000),
+                            pct_less_120k = mean(salary > 100000 & salary <= 1200000),
+                            pct_above_121k = mean(salary >1200000))
+```
+Since there is a significant difference in the number of employees who receive less than 60k, employees who have received more than 60k might be likely to go home. There was more proportion in salary range from 61k to 80k at 34% among people who left while 22% of employees who have not left receive 61k to 80k. Therefore, this salary cannot be the factor contributing to the turnover rate. There is a more significant difference from 81k to 120k as 67% of employees receive higher salaries while a third of them who left the company used to receive such salary. 
+
+
+## 3.	Conclusion(s)/Discussion. 
+
+In analysis, people are more likely to stay at the company compared to when the job_satisfaction is lower. Moreover, employees who quit their job tend to live 1.1 miles further away from the ones who currently work. Compared to distance, job_satisfaction and salary are more likely to be the determining factor when it comes to the turnover rate. However, considering current employees' low job satisfaction is higher than those who quit, the relationship between job_satisfaction and turnover rate cannot be considered positive. When it comes to salary, a third of those who quit the job were proportioned in salary ranging less than 60k while a few current employees were receiving less than 60k. Most current employees at work receive 100k - 120k. Therefore, to prevent an increasing turnover rate, the company will have to figure out a way to improve employees' welfare more than relocating their company to the center where a lot of employees will likely reside. Moreover, the company should higher the overall salary who currently receive less than 100k. 
+
+## 4.	Appendix/Appendices. 
+
+This is the section, where you will provide the detailed information on the following.
+
+Appendix_1 - package 
+Appendix_2(A) employee data
+Appendix_2(B) visualization_employee_data
+Appendix_3(A) table_relationship between job_Satisfaction and left_company
+Appendix_3(B) visualization ggplot_job satisfaction
+Appendix_4(A)employee's salary data
+Appendix_4(B) ggplot_ employee's salary data
+Appendix_5 table_employee's salary range 
+
+
